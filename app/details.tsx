@@ -19,7 +19,7 @@ function Details() {
         <SafeAreaView style={{ flex: 1, backgroundColor: '#0B0B0E' }}>
             <ScrollView className="flex-1 px-4">
                 {/* Header */}
-                <View className="flex-row justify-between items-center py-4">
+                <View className="flex-row  items-center py-4">
                     <Pressable onPress={() => router.back()}>
                         <AntDesign name="left" size={24} color="white" />
                     </Pressable>

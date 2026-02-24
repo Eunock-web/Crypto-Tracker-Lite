@@ -33,8 +33,9 @@ export interface CoinData {
 }
 
 //interface pour la cateoriecard
-export interface CategorieCardInterface{
-    title : string
-    color?: string
-    onPress : () => void
+export interface CategorieCardInterface {
+  title: string
+  color?: string
+  onPress: () => void
+  isActive?: boolean
 }
