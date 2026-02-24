@@ -4,10 +4,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import CategorieCard from '@/components/ui/CategorieCard';
 import { CoinData } from '@/types';
 import CoinList from '@/components/ui/CoinList';
+import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [data, setData] = useState<CoinData[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     // On définit la fonction à l'intérieur ou à l'extérieur, mais on l'appelle proprement
@@ -16,7 +18,7 @@ export default function HomeScreen() {
         setIsLoading(true);
         const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=15&page=1');
         const json = await response.json();
-        setData(json); 
+        setData(json);
       } catch (error) {
         console.error("Erreur API:", error);
       } finally {
@@ -60,11 +62,28 @@ export default function HomeScreen() {
           renderItem={({ item }) => (
             <CoinList
               symbol={item.symbol}
-              name={item.name}              
-              atl={item.atl} 
+              name={item.name}
+              atl={item.atl}
               current_price={item.current_price}
-              onPress={()=>{}}              
-              />
+              onPress={() => {
+                router.push({
+                  pathname: '/details',
+                  params: {
+                    name: item.name,
+                    symbol : item.symbol,
+                    price : item.current_price,
+                    rank : item.market_cap_rank,
+                    cap : item.market_cap,
+                    high : item.high_24h,
+                    low : item.low_24h,
+                    total: item.total_supply,
+                    volume : item.total_volume,
+                    image : item.image,
+                    alt : item.atl
+                  }
+                })
+              }}
+            />
           )}
         />
       )}
