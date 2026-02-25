@@ -9,10 +9,12 @@ interface CoinInterface {
     current_price: number
     price_change_percentage_24h: number
     onPress: () => void
+    onToggleFavorite?: () => void
+    isFavorite?: boolean
     index?: number
 }
 
-function CoinList({ symbol, name, current_price, price_change_percentage_24h, onPress, index = 0 }: CoinInterface) {
+function CoinList({ symbol, name, current_price, price_change_percentage_24h, onPress, onToggleFavorite, isFavorite = false, index = 0 }: CoinInterface) {
     const isPositive = price_change_percentage_24h >= 0;
 
     // Alternating border colors as seen in the image
@@ -50,7 +52,21 @@ function CoinList({ symbol, name, current_price, price_change_percentage_24h, on
                         <Text className="text-white text-lg font-bold">
                             ${(current_price ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </Text>
-                        <FontAwesome name="star" size={12} color="#FFD600" style={{ marginLeft: 4 }} />
+                        {/* Star favorite button */}
+                        <Pressable
+                            onPress={(e) => {
+                                e.stopPropagation?.();
+                                onToggleFavorite?.();
+                            }}
+                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                            style={{ marginLeft: 8 }}
+                        >
+                            <FontAwesome
+                                name={isFavorite ? "star" : "star-o"}
+                                size={16}
+                                color={isFavorite ? "#FFD600" : "#6B7280"}
+                            />
+                        </Pressable>
                     </View>
                     <Text className={`text-xs font-bold mt-1 ${isPositive ? 'text-[#00C853]' : 'text-[#FF5252]'}`}>
                         {isPositive ? '+' : ''}{(price_change_percentage_24h ?? 0).toFixed(2)}%

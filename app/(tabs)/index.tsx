@@ -1,8 +1,8 @@
 import CategorieCard from '@/components/ui/CategorieCard';
 import CoinList from '@/components/ui/CoinList';
+import { useFavorites } from '@/context/FavoritesContext';
 import { CoinData } from '@/types';
 import Feather from '@expo/vector-icons/Feather';
-// import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, ScrollView, Text, TextInput, View } from 'react-native';
@@ -14,6 +14,7 @@ export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const router = useRouter();
+  const { isFavorite, toggleFavorite, favorites } = useFavorites();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,16 +33,16 @@ export default function HomeScreen() {
     fetchData();
   }, []);
 
-  const categories = ['All', 'Top 10', 'Favorites', 'NFTs', 'Defi'];
+  const categories = ['All', 'Top 10', 'Favorites'];
 
-  const filteredData = data.filter(coin => {
+  const filteredData = data.filter((coin) => {
     const matchesSearch = coin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       coin.symbol.toLowerCase().includes(searchQuery.toLowerCase());
     if (!matchesSearch) return false;
 
     if (selectedCategory === 'All') return true;
     if (selectedCategory === 'Top 10') return coin.market_cap_rank <= 10;
-    // Add logic for other categories if needed
+    if (selectedCategory === 'Favorites') return favorites.includes(coin.id);
     return true;
   });
 
@@ -49,7 +50,7 @@ export default function HomeScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0B0B0E' }}>
       <View className="px-5 pt-4">
         {/* Header */}
-        <View className="flex-row  items-center mb-6">
+        <View className="flex-row  mb-6">
           <View>
             <Text className="text-white text-3xl font-black">Crypto Tracker</Text>
             <View className="flex-row items-center mt-1">
@@ -57,9 +58,6 @@ export default function HomeScreen() {
               <Text className="text-gray-500 font-bold text-sm">Live Prices</Text>
             </View>
           </View>
-          {/* <View className="bg-[#1A1A22] p-2.5 rounded-2xl border border-gray-800">
-            <Ionicons name="notifications" size={20} color="white" />
-          </View> */}
         </View>
 
         {/* Search Bar */}
@@ -76,9 +74,9 @@ export default function HomeScreen() {
 
         {/* Categories Section */}
         <View className="mb-6">
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} >
             {categories.map((cat) => (
-              <View key={cat} className="mr-3">
+              <View key={cat} className="mr-8">
                 <CategorieCard
                   title={cat}
                   isActive={selectedCategory === cat}
@@ -108,6 +106,8 @@ export default function HomeScreen() {
               current_price={item.current_price}
               price_change_percentage_24h={item.price_change_percentage_24h}
               index={index}
+              isFavorite={isFavorite(item.id)}
+              onToggleFavorite={() => toggleFavorite(item.id)}
               onPress={() => {
                 router.push({
                   pathname: '/details',
@@ -122,7 +122,7 @@ export default function HomeScreen() {
                     total: (item.total_supply ? (item.total_supply / 1e6).toFixed(1) + 'M' : 'N/A'),
                     volume: (item.total_volume / 1e9).toFixed(1) + 'B',
                     image: item.image,
-                    alt: item.ath // Coingecko ATH is ath, component used atl before mistakenly
+                    alt: item.ath
                   }
                 })
               }}
