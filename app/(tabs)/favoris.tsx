@@ -134,6 +134,7 @@ export default function Favoris() {
                                 router.push({
                                     pathname: '/details',
                                     params: {
+                                        id: item.id,
                                         name: item.name,
                                         symbol: item.symbol,
                                         price: item.current_price,

@@ -1,7 +1,7 @@
 import DetailCard from "@/components/ui/DetailCard";
+import { useFavorites } from "@/context/FavoritesContext";
 import AntDesign from '@expo/vector-icons/AntDesign';
-import EvilIcons from '@expo/vector-icons/EvilIcons';
-// import Ionicons from '@expo/vector-icons/Ionicons';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
@@ -9,7 +9,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 function Details() {
     const router = useRouter();
-    const { name, symbol, price, ran, cap, high, low, total, volume, image, alt } = useLocalSearchParams();
+    const { id, name, symbol, price, ran, cap, high, low, total, volume, image, alt } = useLocalSearchParams();
+    const { isFavorite, toggleFavorite } = useFavorites();
+    const favorited = isFavorite(id as string);
 
     // Formatting helpers (assuming values are passed as strings or numbers)
     const formattedPrice = price ? `$${parseFloat(price as string).toLocaleString()}` : "$0.00";
@@ -82,18 +84,28 @@ function Details() {
             {/* Bottom Button */}
             <View className="px-4 pb-6 pt-2 bg-[#0B0B0E]">
                 <Pressable
-                    onPress={() => { }}
-                    className="bg-[#7B1FA2] flex-row items-center justify-center p-4 rounded-3xl"
+                    onPress={() => toggleFavorite(id as string)}
+                    className="flex-row items-center justify-center p-4 rounded-3xl"
                     style={{
-                        shadowColor: "#7B1FA2",
+                        backgroundColor: favorited ? '#FFD600' : '#7B1FA2',
+                        shadowColor: favorited ? '#FFD600' : '#7B1FA2',
                         shadowOffset: { width: 0, height: 10 },
                         shadowOpacity: 0.3,
                         shadowRadius: 20,
                         elevation: 10
                     }}
                 >
-                    <EvilIcons name="star" size={28} color="white" />
-                    <Text className="text-white font-black text-lg ml-2"> Add to Favorites </Text>
+                    <FontAwesome
+                        name={favorited ? 'star' : 'star-o'}
+                        size={22}
+                        color={favorited ? '#0B0B0E' : 'white'}
+                    />
+                    <Text
+                        style={{ color: favorited ? '#0B0B0E' : 'white' }}
+                        className="font-black text-lg ml-2"
+                    >
+                        {favorited ? 'Remove from Favorites' : 'Add to Favorites'}
+                    </Text>
                 </Pressable>
             </View>
         </SafeAreaView>
